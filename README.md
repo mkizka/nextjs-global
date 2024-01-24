@@ -1,24 +1,75 @@
-# Custom server with TypeScript + Nodemon example
+# カスタムサーバーとNext.jsでモジュールを共有できるのかのテスト
 
-The example shows how you can use [TypeScript](https://typescriptlang.com) on both the server and the client while using [Nodemon](https://nodemon.io/) to live reload the server code without affecting the Next.js universal code.
+- /app ... App Router
+- /pages ... Pages Router
 
-Server entry point is `server.ts` in development and `dist/server.js` in production.
-The `dist` directory should be added to `.gitignore`.
+```
+$ pnpm next info
 
-## Deploy your own
+Operating System:
+  Platform: linux
+  Arch: x64
+  Version: #1 SMP Thu Oct 5 21:02:42 UTC 2023
+Binaries:
+  Node: 20.11.0
+  npm: 10.2.4
+  Yarn: N/A
+  pnpm: 8.5.1
+Relevant Packages:
+  next: 14.1.0
+  eslint-config-next: N/A
+  react: 18.2.0
+  react-dom: 18.2.0
+  typescript: 4.8.4
+Next.js Config:
+  output: N/A
+```
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example) or preview live with [StackBlitz](https://stackblitz.com/github/vercel/next.js/tree/canary/examples/custom-server)
+## できない
+```ts
+export const cache = new Map<string, any>();
+console.log('cache module loaded')
+```
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel/next.js/tree/canary/examples/custom-server)
+```log
+$ pnpm start
 
-## How to use
+> @ start /home/ubuntu/ghq/github.com/mkizka/nextjs-global
+> cross-env NODE_ENV=production node dist/server.js
 
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example:
+cache module loaded
+> Server listening at http://localhost:3000 as production
+cache initialized:  aa2ac3e9-422a-4e0e-9955-ed8503cb61e1
+cache module loaded
+/pagesにアクセス
+cache(pages): undefined
+cache module loaded
+/appにアクセス
+cache(app): undefined
+```
 
-```bash
-npx create-next-app --example custom-server custom-server-app
-# or
-yarn create next-app --example custom-server custom-server-app
-# or
-pnpm create next-app --example custom-server custom-server-app
+## できる
+```ts
+export const cache = global.cache ?? new Map<string, any>();
+global.cache = cache;
+console.log('cache module loaded')
+```
+
+```
+$ pnpm start
+
+> @ start /home/ubuntu/ghq/github.com/mkizka/nextjs-global
+> cross-env NODE_ENV=production node dist/server.js
+
+cache module loaded
+> Server listening at http://localhost:3000 as production
+cache module loaded
+/pagesにアクセス
+cache(pages): undefined
+cache initialized:  37673cc2-6817-4317-9ed5-a1a5b77784e5
+/pagesにアクセス
+cache(pages): 37673cc2-6817-4317-9ed5-a1a5b77784e5
+cache module loaded
+/appにアクセス
+cache(app): 37673cc2-6817-4317-9ed5-a1a5b77784e5
 ```
