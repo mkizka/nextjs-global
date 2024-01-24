@@ -39,8 +39,10 @@ $ pnpm start
 
 cache module loaded
 > Server listening at http://localhost:3000 as production
-cache initialized:  aa2ac3e9-422a-4e0e-9955-ed8503cb61e1
 cache module loaded
+/pagesにアクセス
+cache(pages): undefined
+cache initialized:  cd2411c1-ca9d-4dee-8491-23383cf4d505
 /pagesにアクセス
 cache(pages): undefined
 cache module loaded
